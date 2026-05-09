@@ -7,6 +7,7 @@ services:
       - .env
     volumes:
       - poolio_data:/var/lib/postgresql/
+      - ./flyway/data:/tmp/data
     ports:
       - '5431:5432'
     healthcheck:

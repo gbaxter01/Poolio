@@ -59,7 +59,7 @@ BEGIN;
         league       LEAGUE NOT NULL DEFAULT 'NHL',
         region       TEXT NOT NULL,
         nickname     TEXT NOT NULL,
-        abbr         VARCHAR(3) NOT NULL,
+        abbr         VARCHAR(4) NOT NULL,
         logo         TEXT NOT NULL,
         eliminated   BOOL DEFAULT false NOT NULL,
         UNIQUE (league, espn_team_id) -- ESPN's IDs are league-specific
