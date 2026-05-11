@@ -24,5 +24,18 @@ The goal of using Flyway is to have a reproducible schema which can be applied t
 
 To apply a new SQL file while the Docker Compose network is running, simply restart the **flyway** service. It will notice the new file, apply it, then exit gracefully
 ```
-docker compose -f docker-compose-db.yaml up flyway --build -d
+docker compose -f docker-compose-db.yaml up flyway --build
+```
+
+#### Resetting the database from schema
+This will clear all data  from the database and then rebuild it from the migration files
+```
+# Stop docker compose network
+docker compose -f docker-compose-db.yaml down
+
+# Delete the named volume poolio_data
+docker volume rm poolio_db_poolio_data
+
+# Start the docker compose network
+docker compose -f docker-compose-db.yaml up -d
 ```
