@@ -2,7 +2,6 @@
 set -e
 
 DATABASE_URL="jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_USER"
-echo "DB URL: $DATABASE_URL"
 
 flyway migrate \
   -url=$DATABASE_URL \
