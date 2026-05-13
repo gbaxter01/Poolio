@@ -1,0 +1,10 @@
+name: poolio_api
+
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8080"
+    command: npm run dev
