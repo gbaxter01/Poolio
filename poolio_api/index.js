@@ -1,5 +1,7 @@
 const express = require("express");
 
+const baseLogger = require("./logger");
+
 const PORT = process.env.PORT || 8080;
 
 const app = express();
@@ -11,5 +13,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+  baseLogger.info(`App listening on port ${PORT}`);
 });
