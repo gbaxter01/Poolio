@@ -11,8 +11,8 @@ services:
     logging:
       driver: "json-file"
       options:
-        - max-size: "10m"
-        - max-file: "3"
+        max-size: "10m"
+        max-file: "2"
     command: npm run dev
 
   # Loki service for log storage
@@ -21,19 +21,11 @@ services:
     ports:
       - "3100:3100"
     volumes:
-    - ./grafana/loki-config.yaml:/etc/loki/local-config.yaml
+      - ./grafana/loki-config.yaml:/etc/loki/local-config.yaml
+      - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
 
-  # Prometheus service for metrics storage
-  prometheus:
-    image: prom/prometheus:v3.11.3
-    command:
-      - --web.enable-remote-write-receiver
-      - --config.file=/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-
-  # Grafana UI for metrics and logs dashboards/querying
+  # Grafana UI for log dashboards/querying
   grafana:
    image: grafana/grafana:13.0.1
    environment:
@@ -58,14 +50,6 @@ services:
           isDefault: false
           version: 1
           editable: false
-        - name: Prometheus
-          type: prometheus
-          orgId: 1
-          url: http://prometheus:9090
-          basicAuth: false
-          isDefault: true
-          version: 1
-          editable: false
         EOF
         /run.sh
 
@@ -79,14 +63,9 @@ services:
       ALLOY_DEPLOY_MODE: docker
    volumes:
       - ./grafana/config.alloy:/etc/alloy/config.alloy
-      - /proc:/rootproc:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /sys:/sys:ro
-      - /:/rootfs:ro
-      - /dev/disk/:/dev/disk:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock # Gives Alloy access to send commands to the Docker Daemon
+      - /var/lib/docker/:/var/lib/docker:ro # Where Docker stores the JSON logs for each container
    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
-   extra_hosts:
-        - "host.docker.internal:host-gateway"
-   devices:
-        - /dev/kmsg
+
+volumes:
+  loki_data:
