@@ -1,6 +1,7 @@
 name: poolio_api
 
 services:
+  # Dev-only: The volume mount overwrites what the Dockerfile builds at runtime in order to use Nodemon hot reload. The actual image should be tested before uploading to Prod
   app:
     build: .
     volumes:
@@ -13,13 +14,12 @@ services:
       options:
         max-size: "10m"
         max-file: "2"
-    command: npm run dev
+    # Windows Docker setup needs to run Nodemon in legacy mode for it to work properly (Source: https://github.com/remy/nodemon#application-isnt-restarting)
+    command: npm run nodemon-legacy
 
   # Loki service for log storage
   loki:
     image: grafana/loki:3.7.2
-    ports:
-      - "3100:3100"
     volumes:
       - ./grafana/loki-config.yaml:/etc/loki/local-config.yaml
       - loki_data:/loki
@@ -56,7 +56,7 @@ services:
   # Grafana alloy for collecting logs and metrics
   alloy:
    image: grafana/alloy:v1.16.1
-   privileged: true
+   # Dev-only: This is only exposed for debugging purposes and should not be exposed in PROD
    ports:
      - 12345:12345
    environment:

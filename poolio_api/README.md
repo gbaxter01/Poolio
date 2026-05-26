@@ -13,7 +13,7 @@ Aggregates and stores logs that are pushed to it by Alloy.
 - A custom configuration file [loki-config.yaml](./grafana/loki-config.yaml) is injected as a volume mount.
 
 #### Grafana
-UI for querying and displayed logs and metrics
+UI for querying and displaying logs and metrics
 - The Grafana UI can be accessed through port 3000
 - The custom entrypoint for this service writes the datasources config file `ds.yaml` at startup. This automatically adds Loki as the datasource, so it doesn't have to be manually added through the Grafana UI.
 - Password for logging into **admin** acount is stored in the environment variable `GRAFANA_ADMIN_PASSWORD`
