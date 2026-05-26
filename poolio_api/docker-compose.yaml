@@ -1,0 +1,71 @@
+name: poolio_api
+
+services:
+  # Dev-only: The volume mount overwrites what the Dockerfile builds at runtime in order to use Nodemon hot reload. The actual image should be tested before uploading to Prod
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8080"
+    # Log rotation when log file hits 10MB
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+    # Windows Docker setup needs to run Nodemon in legacy mode for it to work properly (Source: https://github.com/remy/nodemon#application-isnt-restarting)
+    command: npm run nodemon-legacy
+
+  # Loki service for log storage
+  loki:
+    image: grafana/loki:3.7.2
+    volumes:
+      - ./grafana/loki-config.yaml:/etc/loki/local-config.yaml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+
+  # Grafana UI for log dashboards/querying
+  grafana:
+   image: grafana/grafana:13.0.1
+   environment:
+     - GF_SECURITY_ADMIN_USER=admin
+     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+   ports:
+     - 3000:3000/tcp
+   entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+
+  # Grafana alloy for collecting logs and metrics
+  alloy:
+   image: grafana/alloy:v1.16.1
+   # Dev-only: This is only exposed for debugging purposes and should not be exposed in PROD
+   ports:
+     - 12345:12345
+   environment:
+      ALLOY_DEPLOY_MODE: docker
+   volumes:
+      - ./grafana/config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock # Gives Alloy access to send commands to the Docker Daemon
+      - /var/lib/docker/:/var/lib/docker:ro # Where Docker stores the JSON logs for each container
+   command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+
+volumes:
+  loki_data:

@@ -1,0 +1,25 @@
+{
+    "name": "poolio_api",
+    "version": "1.0.0",
+    "description": "API to serve my playoff hockey pool",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "nodemon": "nodemon ./index.js",
+        "nodemon-legacy": "nodemon -L ./index.js"
+    },
+    "author": "Griffin Baxter",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "winston": "^3.19.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.3.0",
+        "globals": "^17.6.0",
+        "nodemon": "^3.1.14",
+        "typescript-eslint": "^8.59.2"
+    }
+}
