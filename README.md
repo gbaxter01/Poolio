@@ -12,3 +12,8 @@ Development is in progress on the Node.js/Express API. Initial development is be
 
 #### /poolio_webapp
 The React front-end is to be completed once API development is finished.
+
+##### /lambda
+Code for the scheduled lambda functions which will update scores and schedules, and audit points tallies
+
+Initial development is being completed on the `feature/lambda-nightly-audit` branch
